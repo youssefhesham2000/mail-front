@@ -34,7 +34,7 @@
             v-bind="attrs"
             v-on="on"
           v-model="sortBy"
-          @click="Sort()"
+          @click="Sort(item.title)"
           >
             {{ item.title }}
           </v-btn></v-list-item-title>
@@ -43,8 +43,8 @@
       </v-menu>
     </v-container>
     <v-container>
-      <v-text-field label="E-Mail"></v-text-field>
-      <v-btn depressed elevation="10" outlined rounded x-large>
+      <v-text-field label="E-Mail" v-model="enteredEmail"></v-text-field>
+      <v-btn depressed elevation="10" outlined rounded x-large @click="addContact()">
         Add Email
       </v-btn>
     </v-container>
@@ -65,7 +65,7 @@
         ></v-switch>
       </template>
     </v-data-table>
-    <v-btn depressed elevation="10" outlined rounded x-large>
+    <v-btn depressed elevation="10" outlined rounded x-large @click="deleteContact(this.selected)">
       Delete Selected
     </v-btn>
   </div>
@@ -81,6 +81,7 @@ export default {
     AddEmail: false,
     singleSelect: false,
     selected: [],
+    enteredEmail:"",
     toBeSearched : "",
     sortBy: "sort by",
     headers: [
@@ -107,10 +108,20 @@ export default {
       //call search fetch and sent toBeSearched
       console.log(this.toBeSearched);
     },
-    sort(){
+    addContact(){
+      var email=this.enteredEmail;
+      console.log(email);
+      //call fetch fn to add contact
+    },
+    Sort(title){
       this.sortBy=title;
-      //call search fetch and sent toBeSearched
       console.log(this.sortBy);
+       console.log(title);
+    //call search fetch and sent toBeSearched
+      //add value in the parameter
+    },
+    deleteContact(selected){
+      console.log(selected);
     }
 
   }
