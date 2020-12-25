@@ -91,9 +91,9 @@
                 <v-list-item
                   v-for="(item, index) in items3"
                   :key="index"
-                  @click="menue3(item.title)"
+                  @click="menue3(item)"
                 >
-                  <v-list-item-title>{{ item.title }}</v-list-item-title>
+                  <v-list-item-title>{{ item }}</v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
@@ -109,6 +109,7 @@
       :headers="headers"
       :items="desserts"
       :single-select="singleSelect"
+      :hide-default-footer="true"
       item-key="name"
       show-select
       class="elevation-1"
@@ -121,11 +122,23 @@
         ></v-switch>
         <!-- <v-btn> -->
 
-        <v-btn depressed white class="open" @click="$router.push('/email/dfr')"
+        <v-btn depressed white class="open" @click="$router.push('/email/977')"
           >open</v-btn
         >
         <!-- </v-btn> -->
         <v-btn depressed white class="open">Delete</v-btn>
+        <!-- <v-spacer></v-spacer> -->
+
+        <v-btn
+          depressed
+          dark
+          style="margin-left:700px; margin-right:10px"
+          class="red"
+          @click="prevPage()"
+          >prev Page</v-btn
+        >
+
+        <v-btn depressed dark class="red" @click="nextPage()">next Page</v-btn>
 
         <br />
       </template>
@@ -134,12 +147,58 @@
 </template>
 <script>
 export default {
-  props: ["name", "userfolder"],
+  props: ["id", "userfolder"],
   mounted() {
-    console.log(this.name);
+    console.log(this.id);
     console.log(this.userfolder);
+    //  axios
+    //   .get(this.port + "/getEmails/"+this.id+"/"+this.userfolder+"/"+this.page)
+    //   .then((res) => {
+    //    this.desserts=res.data;
+    //   })
+    //   .catch((error) => {
+    //     this.errorMessage = error.message;
+    //     console.error("There was an error!", error);
+    //   });
+
+    // axios
+    //   .get(this.port + "/getFolders" / +this.userId)
+    //   .then((res) => {
+    //this.items3= res.data;
+    //   })
+    //   .catch((error) => {
+    //     this.errorMessage = error.message;
+    //     console.error("There was an error!", error);
+    //   });
   },
   methods: {
+    nextPage() {
+      this.page = this.page + 1;
+      //  axios
+      //   .get(this.port + "/getEmails/"+this.id+"/"+this.userfolder+"/"+this.page)
+      //   .then((res) => {
+      //    this.desserts=res.data;
+      //   })
+      //   .catch((error) => {
+      //     this.errorMessage = error.message;
+      //     console.error("There was an error!", error);
+      //   });
+    },
+    prevPage() {
+      if (this.page >= 2) {
+        this.page = this.page - 1;
+
+        //  axios
+        //   .get(this.port + "/getEmails/"+this.id+"/"+this.userfolder+"/"+this.page)
+        //   .then((res) => {
+        //    this.desserts=res.data;
+        //   })
+        //   .catch((error) => {
+        //     this.errorMessage = error.message;
+        //     console.error("There was an error!", error);
+        //   });
+      }
+    },
     menue(value) {
       this.searchType = value;
     },
@@ -152,6 +211,7 @@ export default {
   },
   data() {
     return {
+      page: 1,
       moveFolder: "inbox",
       sortType: "date",
       searchType: "subject",
@@ -160,31 +220,29 @@ export default {
         { title: "date" },
         { title: "sender" },
         { title: "reciever" },
+        { title: "body" },
       ],
       items2: [
-        { title: "subject",value:2 },
-        { title: "date" ,value:5 },
-        { title: "sender",value:3 },
-        { title: "reciever" ,value:4},
-        
+        { title: "subject" },
+        { title: "date" },
+        { title: "sender" },
+        { title: "reciever" },
+        { title: "body" },
       ],
-      items3: [{ title: "inbox" }, { title: "sent" }, { title: "trash" }],
+      items3: ["inbox", "sent", "trash"],
       folder: "Inbox",
       selection: -1,
       singleSelect: false,
       selected: [],
       headers: [
         {
-          text: "Dessert (100g serving)",
+          text: "Subject",
           align: "start",
           sortable: false,
           value: "name",
         },
-        { text: "Calories", value: "calories", sortable: false },
-        { text: "Fat (g)", value: "fat", sortable: false },
-        { text: "Carbs (g)", value: "carbs", sortable: false },
-        { text: "Protein (g)", value: "protein", sortable: false },
-        { text: "Iron (%)", value: "iron", sortable: false },
+        { text: "Date", value: "calories", sortable: false },
+        { text: "Sender", value: "fat", sortable: false },
       ],
       desserts: [
         {
@@ -258,6 +316,22 @@ export default {
           carbs: 51,
           protein: 4.9,
           iron: "22%",
+        },
+        {
+          name: "KitKat",
+          calories: 518,
+          fat: 26.0,
+          carbs: 65,
+          protein: 7,
+          iron: "6%",
+        },
+        {
+          name: "KitKat",
+          calories: 518,
+          fat: 26.0,
+          carbs: 65,
+          protein: 7,
+          iron: "6%",
         },
         {
           name: "KitKat",

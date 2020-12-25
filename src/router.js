@@ -2,13 +2,14 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import email from './components/email'
 import compose from './components/compose'
-import mainPage from './components/mainPage'
+
 import table from './components/table'
 import HelloWorld from './components/HelloWorld'
 import Contacts from './components/Contacts'
 import EmailModification from'./components/EmailModification'
 import folderManipulation from './components/folderManipulation'
 import file from './components/file'
+import mainPage from './components/mainPage'
 
 Vue.use(Router)
 
@@ -18,7 +19,7 @@ export default new Router({
   routes: [
 
    {
-      path: '/table/:name/:userfolder',
+      path: '/:id/table/:id/:userfolder',
       name: 'table',
       component: table,
       props:true
@@ -29,41 +30,44 @@ export default new Router({
       component: HelloWorld
     },
         {
-      path: '/compose',
+      path: '/:id/compose',
       name: 'compose',
-      component: compose
+      component: compose,
+            props:true
+
     },
      {
-      path: '/email/:selectedEmail',
+      path: '/:id/email/:selectedEmail',
       name: 'email',
       component: email,
       props:true
     },
             {
-      path: '/contacts',
+      path: '/:id/contacts',
       name: 'Contacts',
-      component: Contacts
+      component: Contacts,
+     props:true
+
     },
                {
-      path: '/EmailModification',
+      path: '/:id/EmailModification',
       name: 'EmailModification',
-      component: EmailModification
-    },
-    {
-      path: '/mainPage',
-      name: 'mainPage',
-      component: mainPage
+      component: EmailModification,
+      props:true
+
     },
        {
-      path: '/folders/:name',
+      path: '/:x/folders/:id',
       name: 'folderManipulation',
       component: folderManipulation,
       props:true
     },
               {
-      path: '/file',
+      path: '/:id/file',
       name: 'file',
-      component: file
+      component: file,
+      props:true
+
     },
                 {
       path: 'http://localhost:8081//home/:id',

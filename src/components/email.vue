@@ -74,6 +74,7 @@ export default {
     selectedItem: -1,
 
     items: ["srf", "ddd", "dd"],
+    att: [],
 
     //
   }),

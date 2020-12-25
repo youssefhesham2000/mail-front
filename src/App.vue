@@ -29,104 +29,34 @@
         <v-btn @click="toggle()"> sign up instead</v-btn>
       </v-card>
     </v-container>
-    
+
     <v-container v-if="!signin & !ok">
       <v-card dark class="card">
         <br />
         <br />
         <v-text-field label=" first name"></v-text-field>
         <br />
-          <v-text-field label="last name"></v-text-field>
-           
+        <v-text-field label="last name"></v-text-field>
+
         <v-text-field label="email"></v-text-field>
         <br />
         <v-text-field type="password" label="password"></v-text-field>
         <br />
         <br />
         <v-btn
-          style="color:black; background-color:white; margin-left:20px"
+          style="color:black; background-color:white; margin-left:20px; margin-bottom:100px"
           class="btt"
           @click="signup3()"
         >
           sign up</v-btn
         >
-        <v-btn  @click="toggle()"> sign in instead</v-btn>
+        <v-btn @click="toggle()" style="margin-bottom:100px">
+          sign in instead</v-btn
+        >
+        <br />
+        <br />
       </v-card>
     </v-container>
-    <nav >
-      <v-toolbar flat app> </v-toolbar>
-      <v-navigation-drawer app v-model="drawer" dark>
-        <br />
-        <br />
-
-        <h1 style="margin-left:30px; color: white;">
-          name dddd
-        </h1>
-        <br />
-        <v-btn
-          depressed
-          style=" width:300px; padding-right:90px"
-          dark
-          @click="$router.push('/compose')"
-          >Compose</v-btn
-        >
-        <br />
-        <v-btn
-          depressed
-          dark
-          style=" width:300px; padding-right:80px"
-          @click="$router.push('/Folder')"
-          >New Folder</v-btn
-        >
-        <br />
-        <v-btn
-          depressed
-          dark
-          style=" width:300px; padding-right:90px"
-          @click="$router.push('/Contacts')"
-          >Contacts</v-btn
-        >
-        <br />
-        <v-btn
-          depressed
-          dark
-          style=" width:300px; padding-right:80px"
-          @click="$router.push('/EmailModification')"
-          >Email Modification</v-btn
-        >
-        <br />
-        <v-btn
-          depressed
-          dark
-          style=" width:300px; padding-right:80px"
-          @click="$router.push(getUrl2())"
-          >Folders Modification</v-btn
-        >
-        <v-list dense>
-          <v-subheader>Folders</v-subheader>
-          <v-list-item-group v-model="selectedItem" color="primary">
-            <v-list-item v-for="(link, i) in links" :key="i">
-              <v-list-item-icon>
-                <v-icon>mdi-folder</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title
-                  v-text="link.text"
-                  @click="$router.push(findLink(link))"
-                ></v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list-item-group>
-        </v-list>
-
-        <br />
-        <br />
-        <br />
-      </v-navigation-drawer>
-      <v-container>
-        <router-view></router-view>
-      </v-container>
-    </nav>
   </v-app>
 </template>
 
@@ -150,8 +80,8 @@ export default {
     ln: "",
     ps: "",
     selectedItem: -1,
-    signin: true,
-    ok: true,
+    signin: false,
+    ok: false,
     links: [
       {
         icon: "DashBoard",
@@ -181,7 +111,7 @@ export default {
     },
     signinl() {
       axios
-        .get(this.port + "/signIn")
+        .get(this.port + "/signIn" + this.email + "/" + this.password)
         .then((res) => {
           this.id = res.data;
           if (this.id == -1) {
@@ -221,7 +151,7 @@ export default {
 <style scoped>
 .card {
   width: 500px;
-  height: 500px;
+  height: 600px;
   margin: auto;
   margin-top: 200px;
   padding: 40px;

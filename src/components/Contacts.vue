@@ -1,8 +1,8 @@
 <template>
   <div class="tab">
     <v-container>
-      <v-text-field label=" Search" v-model="toBeSearched"></v-text-field>
-      <v-btn depressed elevation="10" outlined rounded x-large @click="search()">
+      <v-text-field label=" Search"></v-text-field>
+      <v-btn depressed elevation="10" outlined rounded x-large>
         Search
       </v-btn>
     </v-container>
@@ -17,34 +17,21 @@
             x-large
             v-bind="attrs"
             v-on="on"
-          v-model="sortBy"
           >
-            {{sortBy}}
+            Sort by
           </v-btn>
         </template>
 
         <v-list>
-          <v-list-item v-for="(item, index) in sortType" :key="index">
-            <v-list-item-title><v-btn
-            depressed
-            elevation="10"
-            outlined
-            rounded
-            x-large
-            v-bind="attrs"
-            v-on="on"
-          v-model="sortBy"
-          @click="Sort(item.title)"
-          >
-            {{ item.title }}
-          </v-btn></v-list-item-title>
+          <v-list-item v-for="(item, index) in EMAil" :key="index">
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
     </v-container>
     <v-container>
-      <v-text-field label="E-Mail" v-model="enteredEmail"></v-text-field>
-      <v-btn depressed elevation="10" outlined rounded x-large @click="addContact()">
+      <v-text-field label="E-Mail"></v-text-field>
+      <v-btn depressed elevation="10" outlined rounded x-large>
         Add Email
       </v-btn>
     </v-container>
@@ -65,7 +52,7 @@
         ></v-switch>
       </template>
     </v-data-table>
-    <v-btn depressed elevation="10" outlined rounded x-large @click="deleteContact(this.selected)">
+    <v-btn depressed elevation="10" outlined rounded x-large>
       Delete Selected
     </v-btn>
   </div>
@@ -81,16 +68,9 @@ export default {
     AddEmail: false,
     singleSelect: false,
     selected: [],
-    enteredEmail:"",
-    toBeSearched : "",
-    sortBy: "sort by",
     headers: [
       { text: "Name", value: "Name" },
       { text: "MainEmailAddress", value: "MainEmailAddress" },
-    ],
-    sortType:[
-      {title:"Name",value:0},
-      {title:"Email",value:1},
     ],
     Contacts: [
       {
@@ -103,28 +83,6 @@ export default {
       },
     ],
   }),
-  methods:{
-    search(){
-      //call search fetch and sent toBeSearched
-      console.log(this.toBeSearched);
-    },
-    addContact(){
-      var email=this.enteredEmail;
-      console.log(email);
-      //call fetch fn to add contact
-    },
-    Sort(title){
-      this.sortBy=title;
-      console.log(this.sortBy);
-       console.log(title);
-    //call search fetch and sent toBeSearched
-      //add value in the parameter
-    },
-    deleteContact(selected){
-      console.log(selected);
-    }
-
-  }
 };
 </script>
 <style scoped>
