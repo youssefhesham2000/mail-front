@@ -127,7 +127,7 @@
 // import axios from "axios";
 // import HelloWorld from "./components/HelloWorld";
 // import axios from "axios";
-
+import axios from "axios";
 export default {
   name: "App",
   props: [],
@@ -141,29 +141,29 @@ export default {
     x = x.substring(ind + 1, x.length + 1);
     this.userId = x;
     console.log(x);
-    // axios
-    //     .get(this.port + "/userState" / +this.userId)
-    //     .then((res) => {
-    //       // this.links= res.data;
-    //       if(this.res.data==false){
-    //  window.location.assign("http://localhost:8081");
+     axios
+         .get(this.port + "/userState" / +this.userId)
+         .then((res) => {
+            this.links= res.data;
+           if(this.res.data==false){
+      window.location.assign("http://localhost:8081");
 
-    //       }
-    //     })
-    //     .catch((error) => {
-    //       this.errorMessage = error.message;
-    //       console.error("There was an error!", error);
-    //     });
+           }
+         })
+         .catch((error) => {
+           this.errorMessage = error.message;
+           console.error("There was an error!", error);
+         });
 
-    // axios
-    //   .get(this.port + "/getFolders" / +this.userId)
-    //   .then((res) => {
-    //     // this.links= res.data;
-    //   })
-    //   .catch((error) => {
-    //     this.errorMessage = error.message;
-    //     console.error("There was an error!", error);
-    //   });
+     axios
+       .get(this.port + "/getFolders" / +this.userId)
+       .then((res) => {
+          this.links= res.data;
+      })
+       .catch((error) => {
+         this.errorMessage = error.message;
+         console.error("There was an error!", error);
+       });
   },
 
   data: () => ({

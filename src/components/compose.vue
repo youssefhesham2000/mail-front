@@ -1,45 +1,24 @@
 <template>
   <div class="tab">
-    <v-container class="sender">
-      <v-chip
-        close-icon="mdi-close-outline"
-        color="purple"
-        label
-        x-large
-        outlined
-        >sender</v-chip
-      >
-      <v-menu top :close-on-content-click="closeOnContentClick">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            depressed
-            elevation="10"
-            outlined
-            rounded
-            x-large
-            v-bind="attrs"
-            v-on="on"
-          >
-            Choose E-Mail
-          </v-btn>
-        </template>
-
-        <v-list>
-          <v-list-item v-for="(item, index) in EMAil" :key="index">
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-    </v-container>
+    
 
     <v-container>
-      <v-text-field label=" Reciever E-Mail"></v-text-field>
-      <v-btn depressed elevation="10" outlined rounded x-large
+      <v-text-field label=" Reciever E-Mail" v-model="recieverEmail"></v-text-field>
+      <v-btn depressed elevation="10" outlined rounded x-large @click="addReciever(recieverEmail)"
         >Add Reciever</v-btn
       >
-      <v-menu>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
+    </v-container>
+     <v-menu>
+        <template  v-slot:activator="{ on, attrs }" >
+          <v-btn depressed elevation="10" outlined rounded x-large  v-bind="attrs"
+            v-on="on">
+        {{ priority }}
+      </v-btn>
+        </template>
+
+        <v-list>
+          <v-list-item v-for="(item, index) in priorites" :key="index">
+           <v-btn
             depressed
             elevation="10"
             outlined
@@ -47,18 +26,14 @@
             x-large
             v-bind="attrs"
             v-on="on"
+            v-model="sortType"
+            @click="changePriority(item)"
           >
-            choose from contacts
+            {{ item.title }}
           </v-btn>
-        </template>
-
-        <v-list>
-          <v-list-item v-for="(item, index) in EMAil" :key="index">
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
-    </v-container>
     <!-- <v-container>
         <v-chip color="blue" label outlined x-large>Attachments</v-chip>
         <v-btn
@@ -74,10 +49,10 @@
         </v-btn>
       </v-container> -->
     <v-container>
-      <v-text-field label=" Subject"></v-text-field>
+      <v-text-field label=" Subject" v-model="subject"></v-text-field>
     </v-container>
     <v-container>
-      <v-textarea autocomplete="email" label="Email"></v-textarea>
+      <v-textarea autocomplete="email" label="Email" v-model="body"></v-textarea>
     </v-container>
 
     <form ref="uploadForm" @submit.prevent="submit">
@@ -114,37 +89,126 @@
     </v-card>
     <br />
     <v-container>
-      <v-btn depressed elevation="10" outlined rounded x-large> Send</v-btn>
+      <v-btn depressed elevation="10" outlined rounded x-large @click="sendEmail()"> Send</v-btn>
       <v-btn depressed elevation="10" outlined rounded x-large>
         Save as a draft</v-btn
       >
-      <v-btn depressed elevation="10" outlined rounded x-large>
-        LOad draft</v-btn
+      <v-btn depressed elevation="10" outlined rounded x-large @click="showDrafts()">
+        Load draft</v-btn
       >
     </v-container>
+<v-container v-if="showDraft">
+  <v-data-table
+      v-model="selected"
+      :headers="headers"
+      :items="drafts"
+      :single-select="singleSelect"
+      item-key="receiverEmail"
+      show-select
+      class="elevation-1"
+    >
+      <template v-slot:top>
+        <v-switch
+          v-model="singleSelect"
+          label="Single select"
+          class="pa-3"
+        ></v-switch>
+      </template>
+    </v-data-table>
+</v-container>
+ <v-btn depressed elevation="10" outlined rounded x-large @click="loadSpecificDraft()"> Load selected Draft</v-btn>
   </div>
+  
 </template>
 
 <script>
-// import axios from "axios";
+ import axios from "axios";
 
 export default {
-  name: "compose",
-
+ 
+ name: "compose",
+   props: ["id"],
   components: {},
 
   data: () => ({
     port: "http://localhost:8089",
-
+    showDraft:false,
     fileName: "",
     selectedItem: -1,
+    selected:null,
     formdata: null,
     items: [],
     att: [],
     EMAil: [],
+    loadedDraft:null,
+    drafts:[
+      {receiverEmail:"aknfdoskn@saf",priority:"2",body:"a7a"},
+      {receiverEmail:"aknfdoskn@af",priority:"2",body:"a7a"},
+
+    ],
+    headers:[
+      {text:"reciever Email", align: "start",
+          sortable: false,
+          value: "receiverEmail"},
+          {text:"Subject",value:"subject"},
+          {text:"priority",value:"priority"},
+           {text:"body",value:"body"},
+    ],
+    recieverEmail:"",
+    recieverEmails:[],
+    emailsCounter:0,
+    subject:"",
+    body:"",
+    priority:0,
+    priorites:[
+      {title:"1",value:1},
+       {title:"2",value:2},
+        {title:"3",value:3},
+    ],
+
     //
   }),
   methods: {
+    loadspecificDraft(){
+      var selecteddraft=this.selected.id;
+      var userId=this.id;
+      this.LoadSingleDraft(userId,selecteddraft)
+    },
+    showDrafts(){
+        var userId=this.id;
+      this.LoadDraftsFetch(userId);
+      this.showDraft=true;
+    },
+    addReciever(){
+      this.recieverEmails[0]=this.recieverEmail
+    },
+    sendEmail(){
+      var recievers=this.recieverEmail;
+      var Body=this.body;
+      var Subject=this.subject;
+      var Priority=this.priority;
+      var userId=this.id;
+      //call send fetch
+      this.SendEmailFetch(recievers,Body,Subject,userId,Priority);
+      console.log(userId);
+      console.log(recievers[0]);
+      console.log(Body);
+      console.log(Subject);
+       console.log(Priority);
+    },
+    saveDraft(){
+       var recievers=this.recieverEmails;
+      var Body=this.body;
+      var Subject=this.subject;
+      var Priority=this.priority;
+      var userId=this.id;
+      this.SaveDraftFetch(recievers,Body,Subject,userId,Priority);
+    },
+    
+    changePriority(item){
+        this.priority=item.value;
+    },
+
     del() {
       var index = this.selectedItem;
       this.items.splice(index, 1);
@@ -154,7 +218,7 @@ export default {
       //   url: this.port + "/deleteAttachment/"+ranNam,
       //   method: "DELETE",
       // }).then((r) => {
-      //   console.log(r);
+      // you  console.log(r);
       // });
     },
 
@@ -166,6 +230,10 @@ export default {
     onUpload() {
       let file = this.$refs.uploadFile.files[0];
       this.fileName = file.name;
+       var r = Math.floor(Math.random() * 100000000000);
+      var ranName = "" + r + "_" + this.fileName;	
+      file.name = ranName;
+      this.rname = ranName;
       this.formdata = new FormData();
       this.formdata.append("file", file);
     },
@@ -173,22 +241,109 @@ export default {
       var x = { name: "" };
       x.name = this.fileName;
       this.items.push(x);
+       this.att.push(this.rname);
       var r = Math.floor(Math.random() * 100000000000);
       var ranName = "" + r + "_" + this.fileName;
       this.att.push(ranName);
 
-      // axios({
-      //   url: "http://localhost:8089/upload",
-      //   method: "POST",
-      //   data: this.formdata,
-      //   headers: {
-      //     Accept: "application/json",
-      //     "Content-Type": "multipart/form-data",
-      //   },
-      // }).then(() => {
-      //   console.log("ok");
-      // });
+       axios({
+         url: "http://localhost:8089/upload",
+         method: "POST",
+         data: this.formdata,
+         headers: {
+           Accept: "application/json",
+           "Content-Type": "multipart/form-data",
+         },
+        
+       }).then(() => {
+         console.log("ok");
+       });
     },
+    getEmailInShape(recievers,Body,Subject,senderId,priority){
+     var e=({senderID:senderId,subject:Subject,recieverEmail:recievers,body:Body,priority:priority})
+      return e;
+    },
+    SendEmailFetch(recievers,Body,Subject,senderId,priority){
+      return fetch("http://localhost:8080/compose",
+      {
+        method:'post',
+                headers: { "Content-Type": "application/json",
+                'Accept': 'application/json'
+                },
+                 body:JSON.stringify(this.getEmailInShape(recievers,Body,Subject,senderId,priority))
+      }    
+      ).then(response=> response.json())
+      .then(
+        body=>{
+          console.log(body);
+          console.log("sucessed");
+        }
+      )
+
+      },
+
+      SaveDraftFetch(recievers,Body,Subject,senderId,priority){
+      return fetch("http://localhost:8080/compose/saveDraft",
+      {
+        method:'post',
+                headers: { "Content-Type": "application/json",
+                'Accept': 'application/json'
+                },
+                 body:JSON.stringify(this.getEmailInShape(recievers,Body,Subject,senderId,priority))
+      }    
+      ).then(response=> response.json())
+      .then(
+        body=>{
+           console.log(body);
+          console.log("sucessedSave");
+        }
+      )
+
+      },
+       LoadDraftsFetch(userId){
+      return fetch("http://localhost:8080/compose/loadDraftList/"+userId,
+      {
+        method:'GET',
+                headers: { "Content-Type": "application/json",
+                'Accept': 'application/json'
+                },
+      }    
+      ).then(response=> response.json())
+      .then(
+        body=>{
+          this.drafts=body;
+          console.log(body)
+          console.log("sucessedLoaded");
+        }
+      )
+
+      },
+      LoadSingleDraft(userId,draftId){
+       return fetch("http://localhost:8080/compose/loadDraft/"+userId/+draftId,
+      {
+        method:'GET',
+                headers: { "Content-Type": "application/json",
+                'Accept': 'application/json'
+                },
+      }    
+      ).then(response=> response.json())
+      .then(
+        body=>{
+          this.loadedDraft=body;
+          this.priority=this.loadedDraft.priority;
+          this.subject=this.loadedDraft.subject;
+          this.recieverEmail=this.loadedDraft.receiverEmail;
+          this.body=this.loadedDraft.body;
+          console.log(body)
+          console.log("sucessedLoaded");
+        }
+      ) 
+      }
+
+
+
+
+
   },
 };
 </script>

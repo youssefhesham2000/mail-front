@@ -20,8 +20,8 @@
       <v-card>
         <div v-if="selection == 1">
           <div class="text-center">
-            <v-text-field class="textf"></v-text-field>
-            <v-btn class="b" color="orange lighten-2" text>
+            <v-text-field class="textf" v-model="searchText"></v-text-field>
+            <v-btn class="b" color="orange lighten-2" text @click="search()">
               Search
             </v-btn>
             <v-menu open-on-hover top offset-y>
@@ -48,7 +48,7 @@
         <div v-if="selection == 0">
           <div class="text-center">
             <br />
-            <v-btn class="b" color="orange lighten-2" text>
+            <v-btn class="b" color="orange lighten-2" text @click="sort()">
               Sort
             </v-btn>
             <v-menu open-on-hover top offset-y>
@@ -77,7 +77,7 @@
           <div class="text-center">
             <br />
             <h2>Select emails to move :</h2>
-            <v-btn class="b" color="orange lighten-2" text>
+            <v-btn class="b" color="orange lighten-2" text @click="move()">
               Move
             </v-btn>
             <v-menu open-on-hover top offset-y>
@@ -92,6 +92,36 @@
                   v-for="(item, index) in items3"
                   :key="index"
                   @click="menue3(item)"
+                >
+                  <v-list-item-title>{{ item }}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </div>
+          <br />
+          <br />
+        </div>
+
+        <div v-if="selection == 2">
+          <div class="text-center">
+            <v-text-field class="textf" v-model="filterText"></v-text-field>
+
+            <br />
+            <v-btn class="b" color="orange lighten-2" text @click="filter()">
+              filter
+            </v-btn>
+            <v-menu open-on-hover top offset-y>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn dark v-bind="attrs" v-on="on">
+                  {{ filterType }}
+                </v-btn>
+              </template>
+
+              <v-list>
+                <v-list-item
+                  v-for="(item, index) in items4"
+                  :key="index"
+                  @click="menue4(item)"
                 >
                   <v-list-item-title>{{ item }}</v-list-item-title>
                 </v-list-item>
@@ -122,11 +152,11 @@
         ></v-switch>
         <!-- <v-btn> -->
 
-        <v-btn depressed white class="open" @click="$router.push('/email/977')"
+        <v-btn depressed white class="open" @click="$router.push(openEmail())"
           >open</v-btn
         >
         <!-- </v-btn> -->
-        <v-btn depressed white class="open">Delete</v-btn>
+        <v-btn depressed white class="open" @click="del()">Delete</v-btn>
         <!-- <v-spacer></v-spacer> -->
 
         <v-btn
@@ -146,6 +176,8 @@
   </div>
 </template>
 <script>
+import axios from "axios";
+
 export default {
   props: ["id", "userfolder"],
   mounted() {
@@ -172,6 +204,156 @@ export default {
     //   });
   },
   methods: {
+    openemail() {
+      var r = this.selected[0].id;
+      return "/" + this.userId + "/email/" + r;
+    },
+    search() {
+      axios
+        .get(
+          this.port +
+            "/search/" +
+            this.userId +
+            "/" +
+            this.userfolder +
+            "/" +
+            this.searchType +
+            "/" +
+            this.searchText
+        )
+        .then((res) => {
+          this.desserts = res.data;
+        })
+        .catch((error) => {
+          this.errorMessage = error.message;
+          console.error("There was an error!", error);
+        });
+    },
+    filter() {
+      axios
+        .get(
+          this.port +
+            "/filter/" +
+            this.userId +
+            "/" +
+            this.userfolder +
+            "/" +
+            this.filterType +
+            "/" +
+            this.filterText
+        )
+        .then((res) => {
+          this.desserts = res.data;
+        })
+        .catch((error) => {
+          this.errorMessage = error.message;
+          console.error("There was an error!", error);
+        });
+    },
+    sort() {
+      var t;
+      if (this.sortType == "Sender") {
+        t = 3;
+      } else if (this.sortType == "Reciever") {
+        t = 4;
+      } else if (this.sortType == "Priority") {
+        t = 6;
+      } else if (this.sortType == "Email") {
+        t = 1;
+      } else if (this.sortType == "Date") {
+        t = 5;
+      } else if (this.sortType == "Subject") {
+        t = 2;
+      }
+      axios({
+        url:
+          this.port +
+          "/sort/" +
+          this.userId +
+          "/" +
+          this.userfolder +
+          "/" +
+          t +
+          "/" +
+          this.page,
+
+        method: "GET",
+      }).then((r) => {
+        this.desserts = r.data;
+      });
+    },
+    del() {
+      var l = [];
+      var i;
+      var n = this.selected.length;
+      for (i = 0; i < n; i++) {
+        l.push(this.selected[i].id);
+      }
+      axios({
+        url: this.port + "/deleteEmails/" + this.userId + "/" + this.userfolder,
+
+        method: "DELETE",
+        data: l,
+      }).then(() => {
+        console.log("ok");
+      });
+      axios
+        .get(
+          this.port +
+            "/getEmails/" +
+            this.id +
+            "/" +
+            this.userfolder +
+            "/" +
+            this.page
+        )
+        .then((res) => {
+          this.desserts = res.data;
+        })
+        .catch((error) => {
+          this.errorMessage = error.message;
+          console.error("There was an error!", error);
+        });
+    },
+    move() {
+      var l = [];
+      var i;
+      var n = this.selected.length;
+      for (i = 0; i < n; i++) {
+        l.push(this.selected[i].id);
+      }
+      axios({
+        url:
+          this.port +
+          "/moveEmails/" +
+          this.userId +
+          "/" +
+          this.userfolder +
+          "/" +
+          this.moveFolder,
+        method: "POST",
+        data: l,
+      }).then(() => {
+        console.log("ok");
+      });
+      axios
+        .get(
+          this.port +
+            "/getEmails/" +
+            this.id +
+            "/" +
+            this.userfolder +
+            "/" +
+            this.page
+        )
+        .then((res) => {
+          this.desserts = res.data;
+        })
+        .catch((error) => {
+          this.errorMessage = error.message;
+          console.error("There was an error!", error);
+        });
+    },
     nextPage() {
       this.page = this.page + 1;
       //  axios
@@ -185,7 +367,7 @@ export default {
       //   });
     },
     prevPage() {
-      if (this.page >= 2) {
+      if (this.page >= 1) {
         this.page = this.page - 1;
 
         //  axios
@@ -208,28 +390,36 @@ export default {
     menue3(value) {
       this.sortType = value;
     },
+    menue4(value) {
+      this.filterType = value;
+    },
   },
   data() {
     return {
-      page: 1,
+      searchText: "",
+      page: 0,
       moveFolder: "inbox",
       sortType: "date",
       searchType: "subject",
+      filterType: "subject",
+      filterText: "",
       items: [
-        { title: "subject" },
-        { title: "date" },
-        { title: "sender" },
-        { title: "reciever" },
-        { title: "body" },
+        { title: "Subject" },
+        { title: "Date" },
+        { title: "Sender" },
+        { title: "Reciever" },
+        { title: "Email" },
       ],
       items2: [
-        { title: "subject" },
-        { title: "date" },
-        { title: "sender" },
-        { title: "reciever" },
-        { title: "body" },
+        { title: "Subject" },
+        { title: "Date" },
+        { title: "Sender" },
+        { title: "Reciever" },
+        { title: "Email" },
+        { title: "Priority" },
       ],
       items3: ["inbox", "sent", "trash"],
+      items4: ["subject", "sender"],
       folder: "Inbox",
       selection: -1,
       singleSelect: false,

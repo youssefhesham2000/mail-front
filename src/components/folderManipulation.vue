@@ -61,20 +61,20 @@
 
 <script>
 // import axios from "axios";
-
+import axios from "axios";
 export default {
   name: "folderManipulation",
   props: ["id"],
   components: {},
   mounted() {
-    //  axios({
-    //       url:
-    //         this.port + "/getFolders/" + this.userId ,
-    //       method: "GET",
-    //     }).then((r) => {
-    //       this.f=r.data;
-    //       console.log("ok");
-    //     });
+     axios({
+           url:
+             this.port + "/getFolders/" + this.userId ,
+           method: "GET",
+         }).then((r) => {
+           this.f=r.data;
+           console.log("ok");
+         });
     var i;
     var t = [];
     var n = this.f.length;
@@ -98,6 +98,13 @@ export default {
     },
     del() {
       var index = this.selectedItem;
+      axios({
+        url:
+          this.port + "/removeFolder/" + this.userId + "/" + this.items[index],
+        method: "DELETE",
+      }).then(() => {
+        console.log("ok");
+      });
       this.items.splice(index, 1);
     },
     rename() {
@@ -145,12 +152,12 @@ export default {
       if (!e) {
         this.items.push(x);
 
-        // axios({
-        //   url: this.port + "/addFolder/" + this.userId + "/" + x,
-        //   method: "PUT",
-        // }).then(() => {
-        //   console.log("ok");
-        // });
+         axios({
+           url: this.port + "/addFolder/" + this.userId + "/" + x,
+           method: "PUT",
+         }).then(() => {
+           console.log("ok");
+         });
       }
     },
   },
